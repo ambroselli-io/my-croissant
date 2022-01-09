@@ -3,7 +3,7 @@ const express = require("express");
 const path = require("path");
 const cors = require("cors");
 const compression = require("compression");
-const helmet = require("helmet");
+// const helmet = require("helmet");
 const logger = require("morgan");
 const cookieParser = require("cookie-parser");
 const { createRequestHandler } = require("@remix-run/express");
@@ -25,12 +25,17 @@ if (process.env.NODE_ENV === "development") {
 
 app.use(cors({ credentials: true, origin: WHITE_LIST_DOMAINS.split(",") }));
 
-app.use(express.static(__dirname + "/../public"));
+// You may want to be more aggressive with this caching
+app.use(express.static("public", { maxAge: "1h" }));
+
+// Remix fingerprints its assets so we can cache forever
+app.use(express.static("public/build", { immutable: true, maxAge: "1y" }));
+
 // Pre middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.text({ type: ["json", "text"] }));
-app.use(helmet());
+// app.use(helmet());
 app.use(cookieParser());
 app.use((req, res, next) => {
   req.ipInfo = (req.headers["x-forwarded-for"] || req.connection.remoteAddress || "")
