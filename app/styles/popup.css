@@ -1,0 +1,25 @@
+.mapboxgl-popup {
+  max-width: 200px;
+}
+
+.mapboxgl-popup-content {
+  text-align: center;
+  font-family: "Open Sans", sans-serif;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.mapboxgl-popup-content > div {
+  border-radius: 0.25em;
+  -webkit-backdrop-filter: blur(40px);
+  backdrop-filter: blur(40px);
+  background-color: rgba(255, 255, 255, 0.7);
+  display: flex;
+}
+
+.mapboxgl-popup-close-button {
+  right: 0.5rem;
+}

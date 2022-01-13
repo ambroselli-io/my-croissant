@@ -1,24 +1,33 @@
-import {
-  Links,
-  LiveReload,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration
-} from "remix";
+import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from "remix";
 
-import tailwind from "./tailwind.css";
-import mapboxStyles from 'mapbox-gl/dist/mapbox-gl.css';
+import tailwind from "./styles/tailwind.css";
+import mapboxStyles from "mapbox-gl/dist/mapbox-gl.css";
+import popup from "./styles/popup.css";
 
 export function links() {
-  return [{ rel: "stylesheet", href: tailwind }, { rel: "stylesheet", href: mapboxStyles }];
+  return [
+    { rel: "stylesheet", href: tailwind },
+    { rel: "stylesheet", href: mapboxStyles },
+    { rel: "stylesheet", href: popup },
+  ];
 }
 
 export function meta() {
-  return { title: "New Remix App" };
+  return { title: "My Croissant" };
 }
 
+export const loader = () => {
+  return {
+    ENV: {
+      API_URL: process.env.API_URL,
+      MAPBOX_ACCESS_TOKEN: process.env.MAPBOX_ACCESS_TOKEN,
+    },
+  };
+};
+
 export default function App() {
+  const { ENV } = useLoaderData();
+
   return (
     <html lang="en" className="h-full">
       <head>
@@ -27,9 +36,14 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="h-full">
+      <body className="h-full relative">
         <Outlet />
         <ScrollRestoration />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(ENV)}`,
+          }}
+        />
         <Scripts />
         {process.env.NODE_ENV === "development" && <LiveReload />}
       </body>

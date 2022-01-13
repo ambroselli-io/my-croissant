@@ -8,7 +8,13 @@ const { catchErrors } = require("../utils/error");
 router.post(
   "/",
   catchErrors(async (req, res) => {
-    await ShopObject.create({ location: { type: "Point", coordinates: req.body.coordinates }, name: req.body.name });
+    await ShopObject.create({
+      location: {
+        type: "Point",
+        coordinates: req.body.coordinates,
+      },
+      name: req.body.name,
+    });
 
     return res.status(200).send({ ok: true });
   })

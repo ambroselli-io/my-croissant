@@ -5,12 +5,12 @@
   "license": "",
   "scripts": {
     "build": "remix build",
-    "dev": "concurrently \"npm run dev:css\" \"remix watch\" \"npm run start:dev\"",
-    "build:css": "tailwindcss -o ./app/tailwind.css",
-    "dev:css": "tailwindcss -o ./app/tailwind.css --watch",
+    "dev": "concurrently \"npm run dev:css\" \"remix watch\"",
+    "build:css": "tailwindcss -o ./app/styles/tailwind.css",
+    "dev:css": "tailwindcss -o ./app/styles/tailwind.css --watch",
     "postinstall": "remix setup node",
     "start": "cross-env NODE_ENV=production node server/src/index.js",
-    "start:dev": "cross-env NODE_ENV=development nodemon server/src/index.js"
+    "start:dev": "cross-env NODE_ENV=development node server/src/index.js"
   },
   "dependencies": {
     "@remix-run/express": "^1.1.1",
@@ -27,6 +27,7 @@
     "fintecture-client": "^2.0.1",
     "helmet": "^5.0.1",
     "jsonwebtoken": "^8.5.1",
+    "localized-address-format": "^1.1.0",
     "mapbox-gl": "^2.6.1",
     "md5": "^2.3.0",
     "mongoose": "^6.1.5",
