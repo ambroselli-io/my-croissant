@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const config = require("../config");
-const UserObject = require("../models/user");
+const config = require("../../../config");
+const UserObject = require("../../../db/models/user");
 const { catchErrors } = require("../utils/error");
 const md5 = require("md5");
 const jwt = require("jsonwebtoken");
@@ -31,16 +31,22 @@ const setCookie = (req, res, user) => {
 router.post(
   "/signup",
   catchErrors(async (req, res) => {
-    if (!req.body.pseudo) return res.status(400).send({ ok: false, error: "Veuillez fournir un pseudo" });
-    if (!req.body.password) return res.status(400).send({ ok: false, error: "Veuillez fournir un mot-de-passe" });
-    if (!req.body.passwordConfirm) return res.status(400).send({ ok: false, error: "Veuillez confirmer votre mot-de-passe" });
+    if (!req.body.pseudo)
+      return res.status(400).send({ ok: false, error: "Veuillez fournir un pseudo" });
+    if (!req.body.password)
+      return res.status(400).send({ ok: false, error: "Veuillez fournir un mot-de-passe" });
+    if (!req.body.passwordConfirm)
+      return res.status(400).send({ ok: false, error: "Veuillez confirmer votre mot-de-passe" });
 
     const checkPseudo = await UserObject.findOne({ pseudo: req.body.pseudo });
 
-    if (checkPseudo !== null) return res.status(400).send({ ok: false, error: "Ce pseudonyme existe déjà" });
+    if (checkPseudo !== null)
+      return res.status(400).send({ ok: false, error: "Ce pseudonyme existe déjà" });
 
     if (req.body.password !== req.body.passwordConfirm) {
-      return res.status(400).send({ ok: false, error: "Les mots-de-passes no sont pas identiques" });
+      return res
+        .status(400)
+        .send({ ok: false, error: "Les mots-de-passes no sont pas identiques" });
     }
 
     const user = await UserObject.create({
@@ -57,14 +63,18 @@ router.post(
 router.post(
   "/signin",
   catchErrors(async (req, res) => {
-    if (!req.body.pseudo) return res.status(400).send({ ok: false, error: "Veuillez fournir un pseudo" });
-    if (!req.body.password) return res.status(400).send({ ok: false, error: "Veuillez fournir un mot-de-passe" });
+    if (!req.body.pseudo)
+      return res.status(400).send({ ok: false, error: "Veuillez fournir un pseudo" });
+    if (!req.body.password)
+      return res.status(400).send({ ok: false, error: "Veuillez fournir un mot-de-passe" });
 
     const user = await UserObject.findOne({ pseudo: req.body.pseudo });
     if (!user) return res.status(400).send({ ok: false, error: "Ce compte n'existe pas" });
 
     if (md5(req.body.password) !== user.password)
-      return res.status(400).send({ ok: false, error: "Le pseudo et/ou le mot-de-passe sont incorrects" });
+      return res
+        .status(400)
+        .send({ ok: false, error: "Le pseudo et/ou le mot-de-passe sont incorrects" });
 
     setCookie(req, res, user);
 

@@ -10,9 +10,9 @@ const { createRequestHandler } = require("@remix-run/express");
 
 const { globalErrorHandler } = require("./utils/error");
 
-const { PORT, WHITE_LIST_DOMAINS } = require("./config.js");
+const { PORT, WHITE_LIST_DOMAINS } = require("../../app/config.js");
 
-require("./mongo");
+// require("./mongo");
 
 // Put together a schema
 const app = express();
@@ -20,7 +20,7 @@ app.use(compression());
 
 if (process.env.NODE_ENV === "development") {
   app.use(logger("dev"));
-  require("../scripts/migrations");
+  // require("../scripts/migrations");
 }
 
 app.use(cors({ credentials: true, origin: WHITE_LIST_DOMAINS.split(",") }));
@@ -44,16 +44,16 @@ app.use((req, res, next) => {
   next();
 });
 // Routes
-app.use("/user", require("./controllers/user"));
-app.use("/transaction", require("./controllers/transaction"));
-app.use("/shop", require("./controllers/shop"));
-app.use("/feedback", require("./controllers/feedback"));
-app.use("/fintecture", require("./hooks/fintecture"));
+// app.use("/user", require("./controllers/user"));
+// app.use("/transaction", require("./controllers/transaction"));
+// app.use("/shop", require("./controllers/shop"));
+// app.use("/feedback", require("./controllers/feedback"));
+// app.use("/fintecture", require("./hooks/fintecture"));
 
 const now = new Date().toISOString();
 
 // Post middleware
-require("./passport")(app);
+// require("./passport")(app);
 
 app.all(
   "*",

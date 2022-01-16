@@ -1,5 +1,5 @@
 const Sentry = require("@sentry/node");
-const { ENVIRONMENT, SENTRY_DSN } = require("../config");
+const { ENVIRONMENT, SENTRY_DSN } = require("../../../app/config");
 
 if (process.env.NODE_ENV === "production") {
   Sentry.init({

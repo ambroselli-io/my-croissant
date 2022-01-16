@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const config = require("../config");
-const ShopObject = require("../models/shop");
+const config = require("../../../app/config");
+const ShopObject = require("../../../db/models/shop");
 const { catchErrors } = require("../utils/error");
 
 router.post(
@@ -21,6 +21,14 @@ router.post(
 );
 
 router.get(
+  "/:id",
+  catchErrors(async (req, res) => {
+    const shop = await ShopObject.findById(req.params.id);
+    return res.status(200).send({ ok: true, data: shop });
+  })
+);
+
+router.get(
   "/",
   catchErrors(async (req, res) => {
     const shops = await ShopObject.find();
@@ -28,10 +36,12 @@ router.get(
     if (req.query.geojson === "true") {
       return res.status(200).send({
         type: "FeatureCollection",
-        features: shops.map(({ name, location }) => ({
+        features: shops.map(({ _id, name, location }) => ({
           type: "Feature",
+          id: _id,
           geometry: location,
           properties: {
+            _id,
             title: name,
           },
         })),

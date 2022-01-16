@@ -1,11 +1,11 @@
-const mongoose = require("mongoose");
-const { MONGO_URL } = require("./config.js");
+import mongoose from "mongoose";
+import { MONGO_URL } from "../app/config.js";
 
+console.log("BADABOUN");
 console.log(`Connect to MONGO : ${MONGO_URL}`);
 //Set up default mongoose connection
 
 mongoose.connect(MONGO_URL); // Get Mongoose to use the global promise library
-mongoose.Promise = global.Promise; //Get the default connection
 
 let db = mongoose.connection;
 
@@ -13,4 +13,4 @@ let db = mongoose.connection;
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 db.once("open", () => console.log("CONNECTED OK"));
 
-module.exports = db;
+export default db;

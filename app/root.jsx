@@ -1,8 +1,9 @@
 import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from "remix";
-
 import tailwind from "./styles/tailwind.css";
 import mapboxStyles from "mapbox-gl/dist/mapbox-gl.css";
 import popup from "./styles/popup.css";
+import Map from "./components/Map";
+import ShopObject from "../db/models/shop";
 
 export function links() {
   return [
@@ -16,17 +17,30 @@ export function meta() {
   return { title: "My Croissant" };
 }
 
-export const loader = () => {
+export const loader = async () => {
+  const shops = await ShopObject.find();
   return {
     ENV: {
       API_URL: process.env.API_URL,
       MAPBOX_ACCESS_TOKEN: process.env.MAPBOX_ACCESS_TOKEN,
     },
+    data: {
+      type: "FeatureCollection",
+      features: shops.map(({ _id, name, location }) => ({
+        type: "Feature",
+        id: _id,
+        geometry: location,
+        properties: {
+          _id,
+          title: name,
+        },
+      })),
+    },
   };
 };
 
 export default function App() {
-  const { ENV } = useLoaderData();
+  const { ENV, data } = useLoaderData();
 
   return (
     <html lang="en" className="h-full">
@@ -36,8 +50,9 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="h-full relative">
+      <body className="h-full relative flex">
         <Outlet />
+        <Map data={data} />
         <ScrollRestoration />
         <script
           dangerouslySetInnerHTML={{

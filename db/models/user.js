@@ -26,4 +26,4 @@ Schema.methods.me = function () {
   };
 };
 
-module.exports = mongoose.model(MODELNAME, Schema);
+module.exports = mongoose.models[MODELNAME] || mongoose.model(MODELNAME, Schema);

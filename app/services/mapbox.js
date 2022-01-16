@@ -1,64 +1,104 @@
 import MapBoxGL from "mapbox-gl";
 import ReactDOM from "react-dom";
+import CustomPopup from "../components/Popup";
 import marker from "../assets/marker.svg";
 
 const MapboxService = class {
-  constructor(container, map, nav) {
-    MapBoxGL.accessToken = window.ENV.MAPBOX_ACCESS_TOKEN;
-    map.current = new MapBoxGL.Map({
-      container: container.current,
-      style: "mapbox://styles/mapbox/streets-v11",
-      center: [4.891332614225945, 52.373091430357476], // Dam square
-      zoom: 15,
-      // antialias: true,
-      // cooperativeGestures: false,
-      // doubleClickZoom: false,
-    });
-    nav.current = new MapBoxGL.NavigationControl({
-      visualizePitch: true,
-    });
-    map.current.addControl(nav.current, "bottom-right");
-    this.map = map.current;
-    return this;
-  }
-
-  getData =
-    ({ data, source = "shops", Component }) =>
-    async () => {
-      this.map.addSource(source, {
-        type: "geojson",
-        data,
+  init = (container, map, nav, center, data) =>
+    new Promise((res) => {
+      MapBoxGL.accessToken = window.ENV.MAPBOX_ACCESS_TOKEN;
+      map.current = new MapBoxGL.Map({
+        container: container.current,
+        style: "mapbox://styles/mapbox/streets-v11",
+        center,
+        zoom: 15,
+        // antialias: true,
+        // cooperativeGestures: false,
+        // doubleClickZoom: false,
       });
-      this.map.addLayer({
-        id: "shops",
-        type: "symbol",
-        source: "shops",
-        layout: {
-          "icon-image": "croissant",
-          "icon-allow-overlap": true,
-          "icon-ignore-placement": true,
-          "icon-size": 0.3,
-          "icon-offset": [0, -75],
-        },
+      nav.current = new MapBoxGL.NavigationControl({
+        visualizePitch: true,
       });
-      let img = new Image(150, 150);
-      img.onload = () => this.map.addImage("croissant", img);
+      map.current.addControl(nav.current, "bottom-right");
+      let img = new Image(133, 150);
+      img.onload = () => map.current.addImage("pin", img);
       img.src = marker;
-
-      // Change the cursor to a pointer when the mouse is over the shops layer.
-      this.map.on("mouseenter", "shops", () => {
-        this.map.getCanvas().style.cursor = "pointer";
+      map.current.on("load", async () => {
+        this.map = map.current;
+        await this.getData({ data });
+        if (this.shopMarkerQueue) {
+          this.addCurrentShopMarker(this.shopMarkerQueue);
+          this.shopMarkerQueue = null;
+        }
+        res();
       });
+    });
 
-      // Change it back to a pointer when it leaves.
-      this.map.on("mouseleave", "shops", () => {
-        this.map.getCanvas().style.cursor = "";
-      });
+  getData = async ({ data, source = "shops" }) => {
+    this.map.addSource(source, {
+      type: "geojson",
+      data,
+    });
+    this.map.addLayer({
+      id: "shops",
+      type: "symbol",
+      source: "shops",
+      layout: {
+        "icon-image": "pin",
+        "icon-allow-overlap": true,
+        "icon-ignore-placement": true,
+        "icon-size": 0.2,
+        "icon-offset": [0, -75],
+      },
+    });
 
-      this.showPopup(Component);
-    };
+    // Change the cursor to a pointer when the mouse is over the shops layer.
+    this.map.on("mouseenter", "shops", () => {
+      this.map.getCanvas().style.cursor = "pointer";
+    });
 
-  showPopup = (Component) => {
+    // Change it back to a pointer when it leaves.
+    this.map.on("mouseleave", "shops", () => {
+      this.map.getCanvas().style.cursor = "";
+    });
+
+    this.createOnMouseUp();
+  };
+
+  enableNavToShop = async (navigate) => {
+    this.map.on("click", "shops", (e) => {
+      const properties = e.features[0].properties;
+      const featureId = properties._id;
+      navigate(`/shop/${featureId}`);
+    });
+  };
+
+  addCurrentShopMarker = (feature) => {
+    if (!this.map) {
+      this.shopMarkerQueue = feature;
+      return;
+    }
+    if (this.currentShopLayer) this.map.removeLayer("current-shop");
+    if (this.currentShopSource) this.map.removeSource("current-shop");
+    this.currentShopSource = this.map.addSource("current-shop", {
+      type: "geojson",
+      data: feature,
+    });
+    this.currentShopLayer = this.map.addLayer({
+      id: "current-shop",
+      type: "symbol",
+      source: "current-shop",
+      layout: {
+        "icon-image": "pin",
+        "icon-allow-overlap": true,
+        "icon-ignore-placement": true,
+        "icon-size": 0.4,
+        "icon-offset": [0, -75],
+      },
+    });
+  };
+
+  showPopup = () => {
     // When a click event occurs on a feature in the shops layer, open a popup at the
     // location of the feature, with description HTML from its properties.
     this.map.on("click", "shops", (e) => {
@@ -88,7 +128,7 @@ const MapboxService = class {
 
       // https://stackoverflow.com/a/50713162/5225096
       const placeholder = document.createElement("div");
-      ReactDOM.render(<Component {...e.features[0].properties} />, placeholder);
+      ReactDOM.render(<CustomPopup {...e.features[0].properties} />, placeholder);
 
       new MapBoxGL.Popup({ offset: popupOffsets })
         .setDOMContent(placeholder)
@@ -96,6 +136,32 @@ const MapboxService = class {
         .addTo(this.map);
     });
   };
+
+  createOnMouseUp = () => {
+    this.map.on("mouseup", async (event) => {
+      console.log([event.lngLat.lng, event.lngLat.lat]);
+    });
+    // map.on("mouseup", async (event) => {
+    //   console.log(event.lngLat); // { lat: lng: }
+    //   const name = await getShopName("Nom du magasin");
+    //   if (!name) return;
+    //   fetch(`${API_URL}/shop`, {
+    //     method: "POST",
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //       Accept: "application/json",
+    //     },
+    //     body: JSON.stringify({
+    //       coordinates: [event.lngLat.lng, event.lngLat.lat],
+    //       name,
+    //     }),
+    //   })
+    //     .then((res) => res.json())
+    //     .then(console.log)
+    //     .catch(console.log);
+    // });
+  };
 };
 
-export default MapboxService;
+const MyMap = new MapboxService();
+export default MyMap;

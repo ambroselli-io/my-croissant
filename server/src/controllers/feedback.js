@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const fetch = require("node-fetch");
-const { TIPIMAIL_API_KEY, TIPIMAIL_API_USER, EMAIL_1 } = require("../config");
+const { TIPIMAIL_API_KEY, TIPIMAIL_API_USER, EMAIL_1 } = require("../../../config");
 const { catchErrors } = require("../utils/error");
 const { capture } = require("../utils/sentry");
 
