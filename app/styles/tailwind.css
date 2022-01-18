@@ -502,39 +502,8 @@ Ensure the default browser behavior of the `hidden` attribute.
   }
 }
 
-.pointer-events-none {
-  pointer-events: none;
-}
-
-.pointer-events-auto {
-  pointer-events: auto;
-}
-
-.absolute {
-  position: absolute;
-}
-
 .relative {
   position: relative;
-}
-
-.inset-0 {
-  top: 0px;
-  right: 0px;
-  bottom: 0px;
-  left: 0px;
-}
-
-.top-0 {
-  top: 0px;
-}
-
-.left-0 {
-  left: 0px;
-}
-
-.bottom-0 {
-  bottom: 0px;
 }
 
 .ml-3 {
@@ -545,16 +514,32 @@ Ensure the default browser behavior of the `hidden` attribute.
   margin-top: 1rem;
 }
 
-.mt-1 {
-  margin-top: 0.25rem;
+.mt-2 {
+  margin-top: 0.5rem;
 }
 
 .mr-3 {
   margin-right: 0.75rem;
 }
 
-.mt-2 {
-  margin-top: 0.5rem;
+.mt-5 {
+  margin-top: 1.25rem;
+}
+
+.-mt-1 {
+  margin-top: -0.25rem;
+}
+
+.-mt-0\.5 {
+  margin-top: -0.125rem;
+}
+
+.-mt-0 {
+  margin-top: -0px;
+}
+
+.mb-10 {
+  margin-bottom: 2.5rem;
 }
 
 .flex {
@@ -569,6 +554,26 @@ Ensure the default browser behavior of the `hidden` attribute.
   height: 15rem;
 }
 
+.h-9 {
+  height: 2.25rem;
+}
+
+.h-10 {
+  height: 2.5rem;
+}
+
+.h-2 {
+  height: 0.5rem;
+}
+
+.h-0\.5 {
+  height: 0.125rem;
+}
+
+.h-0 {
+  height: 0px;
+}
+
 .w-full {
   width: 100%;
 }
@@ -581,16 +586,36 @@ Ensure the default browser behavior of the `hidden` attribute.
   max-width: 24rem;
 }
 
+.flex-shrink {
+  flex-shrink: 1;
+}
+
 .flex-shrink-0 {
   flex-shrink: 0;
 }
 
-.flex-shrink {
+.shrink-0 {
+  flex-shrink: 0;
+}
+
+.shrink {
   flex-shrink: 1;
 }
 
 .flex-grow {
   flex-grow: 1;
+}
+
+.grow {
+  flex-grow: 1;
+}
+
+.transform {
+  transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y));
+}
+
+.cursor-pointer {
+  cursor: pointer;
 }
 
 .flex-col {
@@ -609,16 +634,44 @@ Ensure the default browser behavior of the `hidden` attribute.
   justify-content: flex-start;
 }
 
-.gap-3 {
-  gap: 0.75rem;
+.justify-center {
+  justify-content: center;
 }
 
 .gap-2 {
   gap: 0.5rem;
 }
 
+.overflow-auto {
+  overflow: auto;
+}
+
 .overflow-hidden {
   overflow: hidden;
+}
+
+.overflow-scroll {
+  overflow: scroll;
+}
+
+.overflow-x-auto {
+  overflow-x: auto;
+}
+
+.overflow-y-auto {
+  overflow-y: auto;
+}
+
+.overflow-x-hidden {
+  overflow-x: hidden;
+}
+
+.overflow-y-hidden {
+  overflow-y: hidden;
+}
+
+.overflow-x-clip {
+  overflow-x: clip;
 }
 
 .text-ellipsis {
@@ -633,9 +686,22 @@ Ensure the default browser behavior of the `hidden` attribute.
   border-radius: 1rem;
 }
 
+.border-2 {
+  border-width: 2px;
+}
+
+.border-b {
+  border-bottom-width: 1px;
+}
+
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
+}
+
+.bg-\[\#FFBB01\] {
+  --tw-bg-opacity: 1;
+  background-color: rgb(255 187 1 / var(--tw-bg-opacity));
 }
 
 .object-cover {
@@ -651,6 +717,14 @@ Ensure the default browser behavior of the `hidden` attribute.
 .px-4 {
   padding-left: 1rem;
   padding-right: 1rem;
+}
+
+.pb-10 {
+  padding-bottom: 2.5rem;
+}
+
+.pb-11 {
+  padding-bottom: 2.75rem;
 }
 
 .text-left {
@@ -676,6 +750,10 @@ Ensure the default browser behavior of the `hidden` attribute.
   font-weight: 700;
 }
 
+.font-light {
+  font-weight: 300;
+}
+
 .not-italic {
   font-style: normal;
 }
@@ -685,19 +763,19 @@ Ensure the default browser behavior of the `hidden` attribute.
   color: rgb(239 68 68 / var(--tw-text-opacity));
 }
 
-.text-gray-500 {
-  --tw-text-opacity: 1;
-  color: rgb(107 114 128 / var(--tw-text-opacity));
-}
-
-.text-gray-300 {
-  --tw-text-opacity: 1;
-  color: rgb(209 213 219 / var(--tw-text-opacity));
-}
-
 .text-gray-400 {
   --tw-text-opacity: 1;
   color: rgb(156 163 175 / var(--tw-text-opacity));
+}
+
+.text-\[\#3c4043\] {
+  --tw-text-opacity: 1;
+  color: rgb(60 64 67 / var(--tw-text-opacity));
+}
+
+.underline {
+  -webkit-text-decoration-line: underline;
+          text-decoration-line: underline;
 }
 
 .drop-shadow-lg {
@@ -707,4 +785,18 @@ Ensure the default browser behavior of the `hidden` attribute.
 
 .filter {
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
+.transition-transform {
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.transition {
+  transition-property: color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
 }

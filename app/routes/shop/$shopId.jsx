@@ -1,10 +1,12 @@
-import { useEffect } from "react";
-import { useLoaderData } from "remix";
+import { useEffect, useState } from "react";
+import { useLoaderData, useTransition } from "remix";
+import parsePhoneNumber from "libphonenumber-js";
 import ShopObject from "../../../db/models/shop";
 import MyMap from "../../services/mapbox";
-import pin from "../../assets/pin-grey.svg";
-import clock from "../../assets/clock-grey.svg";
 import todayOpeningHours from "../../utils/opening-hours";
+import ShopInfos from "../../components/ShopInfos";
+import Tabs from "../../components/Tabs";
+import ShopItems from "../../components/ShopItems";
 
 const pictures = [
   "https://images.unsplash.com/photo-1607151815172-254f6b0c9b4b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwyOTE0MTR8MHwxfHJhbmRvbXx8fHx8fHx8fDE2NDIzNDQ3MzQ&ixlib=rb-1.2.1&q=80&w=1080",
@@ -14,6 +16,8 @@ const pictures = [
 ];
 
 export const loader = async ({ params }) => {
+  console.log("start fetchinf");
+  await new Promise((res) => setTimeout(res, 1000));
   const shop = await ShopObject.findById(params.shopId);
   const picture = pictures[Math.round(Math.random() * 3)];
   const openingHours = [
@@ -74,6 +78,7 @@ export const loader = async ({ params }) => {
       priority: 0,
     },
   ];
+  await new Promise((res) => setTimeout(res, 1000));
 
   return {
     data: {
@@ -84,9 +89,39 @@ export const loader = async ({ params }) => {
         _id: shop._id,
         title: shop.name,
         picture,
-        address1: "Goudsbloemstraat 35D",
-        address2: "1015JJ Amsterdam",
+        address1: "Haarlemmerstraat 80",
+        address2: "1013 EV Amsterdam",
         openingHours: todayOpeningHours(openingHours, shop.location.coordinates),
+        phone: parsePhoneNumber("+31207371585").formatInternational(),
+        website: "petitgateau.nl",
+        description:
+          'Petit Gateau (French for "small cake") is a pastry shop selling especially individual cakes. On the week-end though, some croissant and all',
+        items: [
+          {
+            _id: 1,
+            name: "Pain au Chocolat",
+            ingredients: [
+              {
+                _id: 1,
+                name: "Farine",
+                quantity: "80%",
+                supplier: "Moulins de France",
+              },
+              {
+                _id: 2,
+                name: "Beurre",
+                quantity: "80%",
+                supplier: "Beurrier de France",
+              },
+              {
+                _id: 3,
+                name: "Bâton de chocolat",
+                quantity: "80%",
+                supplier: "Beurrier de France",
+              },
+            ],
+          },
+        ],
       },
     },
   };
@@ -99,26 +134,30 @@ const Shop = () => {
     MyMap.addCurrentShopMarker(data);
   }, [data?.id]);
 
+  const [activeTab, setActiveTab] = useState(0);
+
   return (
-    <div className="max-w-sm w-full h-full bg-white drop-shadow-lg">
+    <div className="max-w-sm w-full h-full bg-white drop-shadow-lg flex flex-col overflow-y-hidden">
       <img src={data.properties.picture} className="w-full h-60 object-cover" />
       <h1 className="font-bold px-4 mt-4 text-xl">{data.properties.title}</h1>
-      <address className="flex flex-col px-4 mt-2 text-sm not-italic items-start gap-2 justify-start">
-        <span aria-details="address" className="flex">
-          <img src={pin} className="w-5 mr-3" />
-          {data.properties.address1}, {data.properties.address2}
-        </span>
-        <span aria-details="opening hours" className="flex">
-          <img src={clock} className="w-5 mr-3" />
-          <em className={`not-italic ${!data.properties.openingHours.opened && "text-red-500"}`}>
-            {data.properties.openingHours.opened ? "Opened now" : "Closed now"}
-          </em>
-          <em className="text-gray-400">
-            {!!data.properties.openingHours.schedule &&
-              `\u00A0\u00A0${data.properties.openingHours.schedule}`}
-          </em>
-        </span>
-      </address>
+      <Tabs
+        menu={["Menu", "About"]}
+        className=" grow shrink overflow-y-hidden"
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}>
+        <div className="w-full h-full overflow-x-auto overflow-y-auto flex">
+          <div
+            style={{ transform: `translateX(${-activeTab * 100}%)` }}
+            className="transition-transform h-full flex">
+            <section className="w-full shrink-0  px-4 overflow-y-auto ">
+              <ShopItems data={data} />
+            </section>
+            <section className="w-full shrink-0  px-4 overflow-y-auto ">
+              <ShopInfos data={data} />
+            </section>
+          </div>
+        </div>
+      </Tabs>
     </div>
   );
 };
