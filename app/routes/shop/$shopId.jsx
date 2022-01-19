@@ -6,7 +6,8 @@ import MyMap from "../../services/mapbox";
 import todayOpeningHours from "../../utils/opening-hours";
 import ShopInfos from "../../components/ShopInfos";
 import Tabs from "../../components/Tabs";
-import ShopItems from "../../components/ShopItems";
+import ItemCard from "../../components/ItemCard";
+import items from "../../../mocks/items";
 
 const pictures = [
   "https://images.unsplash.com/photo-1607151815172-254f6b0c9b4b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwyOTE0MTR8MHwxfHJhbmRvbXx8fHx8fHx8fDE2NDIzNDQ3MzQ&ixlib=rb-1.2.1&q=80&w=1080",
@@ -17,7 +18,7 @@ const pictures = [
 
 export const loader = async ({ params }) => {
   console.log("start fetchinf");
-  await new Promise((res) => setTimeout(res, 1000));
+  // await new Promise((res) => setTimeout(res, 1000));
   const shop = await ShopObject.findById(params.shopId);
   const picture = pictures[Math.round(Math.random() * 3)];
   const openingHours = [
@@ -78,7 +79,7 @@ export const loader = async ({ params }) => {
       priority: 0,
     },
   ];
-  await new Promise((res) => setTimeout(res, 1000));
+  // await new Promise((res) => setTimeout(res, 1000));
 
   return {
     data: {
@@ -100,26 +101,12 @@ export const loader = async ({ params }) => {
           {
             _id: 1,
             name: "Pain au Chocolat",
-            ingredients: [
-              {
-                _id: 1,
-                name: "Farine",
-                quantity: "80%",
-                supplier: "Moulins de France",
-              },
-              {
-                _id: 2,
-                name: "Beurre",
-                quantity: "80%",
-                supplier: "Beurrier de France",
-              },
-              {
-                _id: 3,
-                name: "Bâton de chocolat",
-                quantity: "80%",
-                supplier: "Beurrier de France",
-              },
-            ],
+            picture,
+            ingredients: items.find((i) => i.name === "Pain au Chocolat").ingredients,
+            description:
+              "Bien feuilleté, très beurré, chocolat de qualité, dorure sucrée. Bien feuilleté, très beurré, chocolat de qualité, dorure sucrée.",
+            homemade: true,
+            availableHours: todayOpeningHours(openingHours, shop.location.coordinates),
           },
         ],
       },
@@ -129,6 +116,12 @@ export const loader = async ({ params }) => {
 
 const Shop = () => {
   const { data } = useLoaderData();
+  // const transition = useTransition();
+
+  const transition = { state: "loading" };
+
+  console.log(transition);
+  const isLoading = transition.state === "loading";
 
   useEffect(() => {
     MyMap.addCurrentShopMarker(data);
@@ -137,8 +130,10 @@ const Shop = () => {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
-    <div className="max-w-sm w-full h-full bg-white drop-shadow-lg flex flex-col overflow-y-hidden">
-      <img src={data.properties.picture} className="w-full h-60 object-cover" />
+    <div
+      id="drawer"
+      className="max-w-sm w-full h-full bg-white drop-shadow-lg flex flex-col overflow-y-hidden">
+      <img src={data.properties.picture} className="w-full h-60 object-cover" loading="lazy" />
       <h1 className="font-bold px-4 mt-4 text-xl">{data.properties.title}</h1>
       <Tabs
         menu={["Menu", "About"]}
@@ -149,11 +144,13 @@ const Shop = () => {
           <div
             style={{ transform: `translateX(${-activeTab * 100}%)` }}
             className="transition-transform h-full flex">
-            <section className="w-full shrink-0  px-4 overflow-y-auto ">
-              <ShopItems data={data} />
+            <section className="w-full shrink-0 px-4 pt-4 pb-6 overflow-y-auto ">
+              {data.properties.items.map((item) => (
+                <ItemCard key={item._id} item={item} isLoading={isLoading} />
+              ))}
             </section>
-            <section className="w-full shrink-0  px-4 overflow-y-auto ">
-              <ShopInfos data={data} />
+            <section className="w-full shrink-0  px-4 overflow-y-auto pb-6">
+              <ShopInfos data={data} isLoading={isLoading} />
             </section>
           </div>
         </div>

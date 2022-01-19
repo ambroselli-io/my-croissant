@@ -3,7 +3,9 @@ const Tabs = ({ menu, children, activeTab, setActiveTab, className = "" }) => {
 
   return (
     <section className={`tabs ${className}`}>
-      <nav aria-labelledby="primary-navigation" className="flex h-10 border-b w-full">
+      <nav
+        aria-labelledby="primary-navigation"
+        className="flex h-10 border-b border-gray-200 w-full">
         {menu.map((item, index) => (
           <ul
             data-index={index}

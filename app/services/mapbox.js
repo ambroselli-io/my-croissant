@@ -1,7 +1,6 @@
 import MapBoxGL from "mapbox-gl";
 import ReactDOM from "react-dom";
 import CustomPopup from "../components/Popup";
-import marker from "../assets/marker.svg";
 
 const MapboxService = class {
   init = (container, map, nav, center, data) =>
@@ -22,7 +21,7 @@ const MapboxService = class {
       map.current.addControl(nav.current, "bottom-right");
       let img = new Image(133, 150);
       img.onload = () => map.current.addImage("pin", img);
-      img.src = marker;
+      img.src = "/assets/marker.svg";
       map.current.on("load", async () => {
         this.map = map.current;
         await this.getData({ data });

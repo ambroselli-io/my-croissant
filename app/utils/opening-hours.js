@@ -36,15 +36,13 @@ const formatOpenedTimes = (todayOpeningHours) => {
   return `${startTime} - ${pauseStartTime}; ${pauseEndTime} - ${endTime}`;
 };
 
-const todayOpeningHours = (openingHours, coordinates) => {
+const todayOpeningHours = (hours, coordinates) => {
   const timeZone = find(coordinates[1], coordinates[0]);
   const today = tzDate(new Date(), timeZone);
-  const weekDay = weekdays[today.getDay()];
-  const todayOpeningHours = openingHours
-    .filter((o) => o.weekday === weekDay)
-    .sort((o1, o2) => (o1.priority > o2.priority ? -1 : 1))
-    .map(({ start, end, pauseStart, pauseEnd, date, closed = false }) => {
-      if (closed) return { closed: true };
+  const weekday = weekdays[today.getDay()];
+  const openingHours = hours
+    .map(({ start, end, pauseStart, pauseEnd, date, closed = false, weekday, priority }) => {
+      if (closed) return { closed: true, weekday, priority };
       const tzStart = tzDate(
         new Date(
           today.getFullYear(),
@@ -66,7 +64,7 @@ const todayOpeningHours = (openingHours, coordinates) => {
         timeZone
       );
       if (!pauseStart || !pauseEnd) {
-        return { start: tzStart, end: tzEnd, date: date || today, closed };
+        return { start: tzStart, end: tzEnd, date: date || today, closed, weekday, priority };
       }
       const tzPauseStart = tzDate(
         new Date(
@@ -95,37 +93,59 @@ const todayOpeningHours = (openingHours, coordinates) => {
         pauseEnd: tzPauseEnd,
         date: date || today,
         closed,
+        weekday,
+        priority,
       };
-    })?.[0];
+    })
+    .map((dayOpeningHours) => {
+      const { weekday, priority } = dayOpeningHours;
+      if (dayOpeningHours.closed) return { opened: false, weekday, priority };
+      if (
+        dayOpeningHours.start.toISOString() > today.toISOString() ||
+        dayOpeningHours.end.toISOString() < today.toISOString()
+      ) {
+        return {
+          opened: false,
+          schedule: formatOpenedTimes(dayOpeningHours),
+          weekday,
+          priority,
+        };
+      }
+      if (!dayOpeningHours.pauseStart) {
+        return {
+          opened: true,
+          schedule: formatOpenedTimes(dayOpeningHours),
+          weekday,
+          priority,
+        };
+      }
+      if (
+        dayOpeningHours.pauseStart.toISOString() < today.toISOString() &&
+        dayOpeningHours.pauseEnd.toISOString() > today.toISOString()
+      ) {
+        return {
+          opened: false,
+          schedule: formatOpenedTimes(dayOpeningHours),
+          weekday,
+          priority,
+        };
+      }
+      return {
+        opened: true,
+        schedule: formatOpenedTimes(dayOpeningHours),
+        weekday,
+        priority,
+      };
+    });
 
-  if (todayOpeningHours.closed) return { opened: false };
-  if (
-    todayOpeningHours.start.toISOString() > today.toISOString() ||
-    todayOpeningHours.end.toISOString() < today.toISOString()
-  ) {
-    return {
-      opened: false,
-      schedule: formatOpenedTimes(todayOpeningHours),
-    };
-  }
-  if (!todayOpeningHours.pauseStart) {
-    return {
-      opened: true,
-      schedule: formatOpenedTimes(todayOpeningHours),
-    };
-  }
-  if (
-    todayOpeningHours.pauseStart.toISOString() < today.toISOString() &&
-    todayOpeningHours.pauseEnd.toISOString() > today.toISOString()
-  ) {
-    return {
-      opened: false,
-      schedule: formatOpenedTimes(todayOpeningHours),
-    };
-  }
+  console.log(openingHours);
+
+  const todayOpeningHours = openingHours
+    .filter((o) => o.weekday === weekday)
+    .sort((o1, o2) => (o1.priority > o2.priority ? -1 : 1))?.[0];
   return {
-    opened: true,
-    schedule: formatOpenedTimes(todayOpeningHours),
+    ...todayOpeningHours,
+    openingHours,
   };
 };
 
